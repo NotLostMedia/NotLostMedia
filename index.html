@@ -157,6 +157,22 @@
     .cerrar:hover, .cerrar:focus-visible { background: var(--rosa); color: var(--fondo); }
     .vacio { color: var(--gris); }
 
+    .musica-btn {
+      position: fixed;
+      right: clamp(12px, 2vw, 28px);
+      bottom: clamp(12px, 2vw, 28px);
+      z-index: 10;
+      border: 1px solid var(--rosa);
+      background: var(--fondo);
+      color: var(--rosa);
+      font: inherit;
+      font-size: 1rem;
+      padding: .4rem .9rem;
+      cursor: pointer;
+    }
+    .musica-btn:hover, .musica-btn:focus-visible { background: var(--rosa); color: var(--fondo); }
+    .musica-btn[hidden] { display: none; }
+
     @media (max-width: 700px) {
       .logo { width: 60vw; max-width: none; }
     }
@@ -199,6 +215,9 @@
       <button class="cerrar" id="cerrar" type="button">Cerrar</button>
     </div>
   </dialog>
+
+  <audio id="musica" src="audio/musica.mp3" loop preload="none"></audio>
+  <button class="musica-btn" id="musica-btn" type="button" aria-pressed="false">♪ música off</button>
 
   <script>
     /* ------------------------------------------------------------
@@ -320,6 +339,7 @@
     }
 
     function abrir(v) {
+      pausarMusicaPorVideo();
       reproductor.innerHTML = "";
       if (v.tipo === "vimeo") {
         const iframe = document.createElement("iframe");
@@ -353,9 +373,70 @@
       dialogo.close();
     }
 
-    dialogo.addEventListener("close", () => { reproductor.innerHTML = ""; });
+    dialogo.addEventListener("close", () => { reproductor.innerHTML = ""; reanudarMusica(); });
     document.getElementById("cerrar").addEventListener("click", cerrar);
     dialogo.addEventListener("click", (e) => { if (e.target === dialogo) cerrar(); });
+
+    /* ------------------------------------------------------------
+       MÚSICA DE FONDO
+       El archivo va en audio/musica.mp3.
+       Los navegadores no dejan reproducir sonido solo: arranca con el
+       primer clic, toque o tecla del visitante. El botón la apaga y la
+       prende, y se acuerda de lo que eligió. Al abrir un video, la
+       música se pausa y vuelve cuando se cierra.
+    ------------------------------------------------------------ */
+    const musica = document.getElementById("musica");
+    const botonMusica = document.getElementById("musica-btn");
+    const VOLUMEN = 0.4;
+    let pausadaPorVideo = false;
+    musica.volume = VOLUMEN;
+
+    function leerPreferencia() {
+      try { return localStorage.getItem("musica"); } catch (e) { return null; }
+    }
+    function guardarPreferencia(valor) {
+      try { localStorage.setItem("musica", valor); } catch (e) { /* sin guardado */ }
+    }
+    function pintarBoton() {
+      const sonando = !musica.paused;
+      botonMusica.textContent = sonando ? "♪ música on" : "♪ música off";
+      botonMusica.setAttribute("aria-pressed", String(sonando));
+    }
+    function reproducir() {
+      const intento = musica.play();
+      if (intento && intento.catch) intento.catch(() => pintarBoton());
+    }
+
+    function primerGesto(e) {
+      if (e.target.closest && e.target.closest("#musica-btn")) return; // lo maneja el botón
+      quitarEscuchas();
+      if (leerPreferencia() === "off") return;
+      // Si el primer clic fue para abrir un video, la música espera a que se cierre
+      if (dialogo.open) { pausadaPorVideo = true; return; }
+      reproducir();
+    }
+    function quitarEscuchas() {
+      ["click", "touchend", "keydown"].forEach((t) => document.removeEventListener(t, primerGesto));
+    }
+    ["click", "touchend", "keydown"].forEach((t) => document.addEventListener(t, primerGesto));
+
+    botonMusica.addEventListener("click", () => {
+      quitarEscuchas();
+      if (musica.paused) { guardarPreferencia("on"); reproducir(); }
+      else { guardarPreferencia("off"); musica.pause(); }
+    });
+    musica.addEventListener("play", pintarBoton);
+    musica.addEventListener("pause", pintarBoton);
+    // Si el archivo no existe o falla, se esconde el botón
+    musica.addEventListener("error", () => { botonMusica.hidden = true; });
+
+    function pausarMusicaPorVideo() {
+      if (!musica.paused) { musica.pause(); pausadaPorVideo = true; }
+    }
+    function reanudarMusica() {
+      if (pausadaPorVideo) { pausadaPorVideo = false; reproducir(); }
+    }
+    pintarBoton();
 
     if (VIDEOS.length === 0) {
       const vacio = document.createElement("p");
