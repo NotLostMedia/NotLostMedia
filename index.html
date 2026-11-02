@@ -3,35 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Videos</title>
+  <title>Not Lost Media</title>
+  <meta name="description" content="Un museo de videos de internet.">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --fondo: #ffffff;
-      --texto: #1a1a1a;
-      --texto-suave: #666666;
-      --borde: #dddddd;
-      --acento: #1a1a1a;
+      --fondo: #161714;
+      --rosa: #e61b7d;
+      --rosa-oscuro: #a6155a;
+      --blanco: #ffffff;
+      --gris: #a8a8a4;
+
+      /* Cinta: alto del patrón y tiempo que tarda en recorrer una repetición */
+      --alto-cinta: clamp(56px, 8vw, 170px);
+      --vel-cinta: 8s;
+
+      --fuente: "Archivo Narrow", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
     }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --fondo: #151515;
-        --texto: #f2f2f2;
-        --texto-suave: #a0a0a0;
-        --borde: #333333;
-        --acento: #f2f2f2;
-      }
-    }
+
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
       background: var(--fondo);
-      color: var(--texto);
+      color: var(--blanco);
+      font-family: var(--fuente);
       line-height: 1.5;
     }
-    header, main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem; }
-    h1 { margin: 0 0 .25rem; font-size: 1.75rem; }
-    header p { margin: 0; color: var(--texto-suave); }
+
+    /* ---------- PORTADA ---------- */
+    .portada {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      padding-top: clamp(16px, 4vw, 70px);
+    }
+
+    .cinta {
+      height: var(--alto-cinta);
+      background: url("assets/cinta.png") repeat-x 0 0 / auto 100%;
+      animation: mover var(--vel-cinta) linear infinite;
+      flex: none;
+    }
+    /* 809 / 424 = proporción del PNG: se mueve exactamente un ancho de patrón */
+    @keyframes mover {
+      to { background-position-x: calc(var(--alto-cinta) * -1.908); }
+    }
+
+    .centro {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(24px, 4vw, 72px);
+      padding: 2rem 1rem 3rem;
+      text-align: center;
+    }
+    .logo {
+      width: clamp(220px, 25vw, 560px);
+      max-width: 70vw;
+      height: auto;
+      display: block;
+    }
+    .bienvenida {
+      margin: 0;
+      font-size: clamp(18px, 2.1vw, 42px);
+      line-height: 1.45;
+      max-width: 40ch;
+    }
+    .bienvenida p { margin: 0 0 1.1em; }
+    .bienvenida p:last-child { margin-bottom: 0; }
+
+    .bajar {
+      color: var(--rosa);
+      text-decoration: none;
+      font-size: clamp(18px, 2vw, 32px);
+      line-height: 1;
+    }
+    .bajar:focus-visible { outline: 2px solid var(--rosa); outline-offset: 6px; }
+
+    /* ---------- VIDEOS ---------- */
+    .videos {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: clamp(32px, 6vw, 96px) 1rem 4rem;
+    }
+    .videos h2 {
+      margin: 0 0 1.5rem;
+      font-weight: 600;
+      font-size: clamp(28px, 4vw, 56px);
+      color: var(--rosa);
+      line-height: 1;
+    }
 
     .grilla {
       display: grid;
@@ -39,61 +107,85 @@
       gap: 1.25rem;
     }
     .tarjeta {
-      border: 1px solid var(--borde);
-      border-radius: 8px;
-      overflow: hidden;
+      border: 1px solid var(--rosa);
       background: none;
       color: inherit;
       text-align: left;
       padding: 0;
       cursor: pointer;
       font: inherit;
+      display: block;
     }
-    .tarjeta:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+    .tarjeta:hover, .tarjeta:focus-visible { background: var(--rosa-oscuro); }
+    .tarjeta:focus-visible { outline: 3px solid var(--blanco); outline-offset: 2px; }
     .miniatura {
       aspect-ratio: 16 / 9;
-      background: var(--borde);
+      background: var(--rosa-oscuro);
       display: block;
       width: 100%;
       object-fit: cover;
     }
     .info { padding: .75rem; }
-    .info h2 { margin: 0 0 .25rem; font-size: 1rem; }
-    .info p { margin: 0; font-size: .9rem; color: var(--texto-suave); }
+    .info h3 { margin: 0; font-size: 1.15rem; font-weight: 600; }
+    .info p { margin: .25rem 0 0; font-size: .95rem; color: var(--gris); }
+    .info p:empty { display: none; }
+    .tarjeta:hover .info p, .tarjeta:focus-visible .info p { color: var(--blanco); }
 
     dialog {
       width: min(900px, 94vw);
-      border: none;
-      border-radius: 8px;
+      border: 1px solid var(--rosa);
       padding: 0;
       background: var(--fondo);
-      color: var(--texto);
+      color: var(--blanco);
+      font-family: var(--fuente);
     }
-    dialog::backdrop { background: rgba(0, 0, 0, .75); }
+    dialog::backdrop { background: rgba(0, 0, 0, .85); }
     .reproductor { aspect-ratio: 16 / 9; background: #000; }
     .reproductor video, .reproductor iframe { width: 100%; height: 100%; border: 0; display: block; }
     .dialogo-pie { display: flex; justify-content: space-between; align-items: start; gap: 1rem; padding: .75rem 1rem; }
-    .dialogo-pie h2 { margin: 0; font-size: 1.1rem; }
-    .dialogo-pie p { margin: .25rem 0 0; color: var(--texto-suave); font-size: .9rem; }
+    .dialogo-pie h2 { margin: 0; font-size: 1.2rem; font-weight: 600; }
+    .dialogo-pie p { margin: .25rem 0 0; color: var(--gris); font-size: .95rem; }
+    .dialogo-pie p:empty { display: none; }
     .cerrar {
-      border: 1px solid var(--borde);
+      border: 1px solid var(--rosa);
       background: none;
-      color: inherit;
-      border-radius: 6px;
-      padding: .4rem .8rem;
+      color: var(--rosa);
+      padding: .35rem .9rem;
       cursor: pointer;
       font: inherit;
     }
-    .vacio { color: var(--texto-suave); }
+    .cerrar:hover, .cerrar:focus-visible { background: var(--rosa); color: var(--fondo); }
+    .vacio { color: var(--gris); }
+
+    @media (max-width: 700px) {
+      .logo { width: 60vw; max-width: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cinta { animation: none; }
+      html { scroll-behavior: auto; }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Bienvenidx</h1>
-    <p>Elegí un video, pibe</p>
-  </header>
 
-  <main>
+  <section class="portada">
+    <div class="cinta" role="presentation"></div>
+
+    <div class="centro">
+      <img class="logo" src="assets/logo.png" alt="Not Lost Media">
+
+      <div class="bienvenida">
+        <p>Bienvenidx<br>
+        Este es un museo de videos de internet, porque guardarlos en un pendrive ya no era suficiente.</p>
+        <p>Nada, no tiene mucha más función. Enjoy</p>
+      </div>
+
+      <a class="bajar" href="#videos" aria-label="Ir a los videos">↓</a>
+    </div>
+  </section>
+
+  <main class="videos" id="videos">
+    <h2>Videos</h2>
     <div class="grilla" id="grilla"></div>
   </main>
 
@@ -113,25 +205,21 @@
        LISTA DE VIDEOS
        Para agregar un video, copiá uno de los bloques y cambiá los datos.
 
-       tipo: "vimeo"    -> un video de Vimeo (ID y, si es no listado, el hash)
-             "youtube"  -> un video de YouTube (solo hace falta el ID)
+       tipo: "youtube"  -> un video de YouTube (solo hace falta el ID)
+             "vimeo"    -> un video de Vimeo (ID y, si es no listado, el hash)
              "archivo"  -> un .mp4 que subís al repo (carpeta /videos)
 
        Ejemplos:
-         { tipo: "vimeo", titulo: "...", descripcion: "...",
-           id: "123456789", hash: "a1b2c3d4e5" }
-
          { tipo: "youtube", titulo: "...", descripcion: "...",
            id: "dQw4w9WgXcQ" }
+
+         { tipo: "vimeo", titulo: "...", descripcion: "...",
+           id: "123456789", hash: "a1b2c3d4e5" }
 
          { tipo: "archivo", titulo: "...", descripcion: "...",
            src: "videos/mi-video.mp4", miniatura: "miniaturas/mi-video.jpg" }
 
-       Cómo sacar el ID y el hash de Vimeo:
-         Si el link es https://vimeo.com/123456789/a1b2c3d4e5
-         el ID es 123456789 y el hash es a1b2c3d4e5.
-         Si el video es público, el link no tiene hash: dejá hash vacío ("").
-       La miniatura es opcional (en Vimeo y YouTube se busca sola).
+       La miniatura es opcional (en YouTube y Vimeo se busca sola).
     ------------------------------------------------------------ */
     const VIDEOS = [
       {
@@ -178,11 +266,30 @@
       return "";
     }
 
-    function crearTarjeta(v, i) {
+    function urlVimeo(v) {
+      return "https://vimeo.com/" + v.id + (v.hash ? "/" + v.hash : "");
+    }
+
+    // Busca la miniatura en Vimeo. Si falla, queda el recuadro de color.
+    async function cargarMiniaturaVimeo(v, hueco) {
+      try {
+        const r = await fetch("https://vimeo.com/api/oembed.json?url=" + encodeURIComponent(urlVimeo(v)));
+        if (!r.ok) return;
+        const datos = await r.json();
+        if (!datos.thumbnail_url) return;
+        const img = document.createElement("img");
+        img.className = "miniatura";
+        img.src = datos.thumbnail_url;
+        img.alt = "";
+        img.loading = "lazy";
+        hueco.replaceWith(img);
+      } catch (e) { /* sin miniatura */ }
+    }
+
+    function crearTarjeta(v) {
       const boton = document.createElement("button");
       boton.type = "button";
       boton.className = "tarjeta";
-      boton.dataset.indice = i;
 
       const mini = miniaturaDe(v);
       if (mini) {
@@ -201,35 +308,15 @@
 
       const info = document.createElement("div");
       info.className = "info";
-      const h2 = document.createElement("h2");
-      h2.textContent = v.titulo;
+      const h3 = document.createElement("h3");
+      h3.textContent = v.titulo;
       const p = document.createElement("p");
       p.textContent = v.descripcion || "";
-      info.append(h2, p);
+      info.append(h3, p);
       boton.appendChild(info);
 
       boton.addEventListener("click", () => abrir(v));
       return boton;
-    }
-
-    function urlVimeo(v) {
-      return "https://vimeo.com/" + v.id + (v.hash ? "/" + v.hash : "");
-    }
-
-    // Busca la miniatura en Vimeo. Si falla, queda el recuadro gris.
-    async function cargarMiniaturaVimeo(v, hueco) {
-      try {
-        const r = await fetch("https://vimeo.com/api/oembed.json?url=" + encodeURIComponent(urlVimeo(v)));
-        if (!r.ok) return;
-        const datos = await r.json();
-        if (!datos.thumbnail_url) return;
-        const img = document.createElement("img");
-        img.className = "miniatura";
-        img.src = datos.thumbnail_url;
-        img.alt = "";
-        img.loading = "lazy";
-        hueco.replaceWith(img);
-      } catch (e) { /* sin miniatura */ }
     }
 
     function abrir(v) {
@@ -273,10 +360,10 @@
     if (VIDEOS.length === 0) {
       const vacio = document.createElement("p");
       vacio.className = "vacio";
-      vacio.textContent = "Todavía no hay videos. Agregalos en la lista VIDEOS de index.html.";
+      vacio.textContent = "Todavía no hay videos.";
       grilla.replaceWith(vacio);
     } else {
-      VIDEOS.forEach((v, i) => grilla.appendChild(crearTarjeta(v, i)));
+      VIDEOS.forEach((v) => grilla.appendChild(crearTarjeta(v)));
     }
   </script>
 </body>
